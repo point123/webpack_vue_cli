@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
     entry: "./src/main.js",
@@ -82,11 +83,16 @@ module.exports = {
             },
             {
                 test: /\.vue$/,
-                loader: "@vue/loader"
+                loader: "vue-loader"
+            },
+            {
+                test: /\.pug$/,
+                loader: 'pug-plain-loader'
             }
         ]
     },
     plugins: [
+        new VueLoaderPlugin(),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, "../public/index.html")
         }),
@@ -114,6 +120,9 @@ module.exports = {
     ],
     mode: "production",
     devtool: false,
+    resolve: {
+        extensions: [".vue",".js",".json"]
+    },
     optimization: {
         splitChunks: {
             chunks: "all"

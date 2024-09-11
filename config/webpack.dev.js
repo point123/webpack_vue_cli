@@ -1,6 +1,7 @@
 const path = require("node:path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const EslintWebpackPlugin = require("eslint-webpack-plugin");
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
     entry: "./src/main.js",
@@ -16,7 +17,7 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    "style-loader",
+                    "vue-style-loader",
                     "css-loader",
                     "postcss-loader"
                 ]
@@ -24,7 +25,7 @@ module.exports = {
             {
                 test: /\.less$/,
                 use: [
-                    "style-loader",
+                    "vue-style-loader",
                     "css-loader",
                     "postcss-loader",
                     "less-loader"
@@ -33,7 +34,7 @@ module.exports = {
             {
                 test: /\.s[ac]ss$/,
                 use: [
-                    "style-loader",
+                    "vue-style-loader",
                     "css-loader",
                     "postcss-loader",
                     "sass-loader"
@@ -42,7 +43,7 @@ module.exports = {
             {
                 test: /\.styl$/,
                 use: [
-                    "style-loader",
+                    "vue-style-loader",
                     "css-loader",
                     "postcss-loader",
                     "stylus-loader"
@@ -78,11 +79,16 @@ module.exports = {
             },
             {
                 test: /\.vue$/,
-                loader: "@vue/loader"
+                loader: "vue-loader"
+            },
+            {
+                test: /\.pug$/,
+                loader: 'pug-plain-loader'
             }
         ]
     },
     plugins: [
+        new VueLoaderPlugin(),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, "../public/index.html")
         }),
@@ -95,6 +101,9 @@ module.exports = {
     ],
     mode: "development",
     devtool: "source-map",
+    resolve: {
+        extensions: [".vue",".js",".json"]
+    },
     optimization: {
         splitChunks: {
             chunks: "all"
