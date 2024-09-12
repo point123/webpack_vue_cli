@@ -56,10 +56,5 @@ eslint-plugin-vue
 https://eslint.vuejs.ac.cn/user-guide/
 */
 
-/* 
-配置中的files不是仅针对配置的范围生效,具体看chatgpt
-.eslintignore文件不再支持,配置全局忽略文件,需要单独配置一个对象,且不包含除ignores之外的其他属性
-*/
-
 // eslint-plugin-vue 中文文档
 // https://eslint.vuejs.ac.cn/user-guide/
