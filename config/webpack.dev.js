@@ -116,3 +116,5 @@ module.exports = {
         historyApiFallback: true
     }
 }
+
+// vue2最高只支持vue-loader@15

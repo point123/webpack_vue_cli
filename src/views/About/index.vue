@@ -4,7 +4,12 @@
 
 <script>
 export default {
-    name: "about"
+    name: "about",
+    methods: {
+        hanleFunction() {
+            var a;
+        }
+    }
 }
 </script>
 

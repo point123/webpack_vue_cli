@@ -1,0 +1,7 @@
+{
+    "eslint.useFlatConfig": true,
+    // "eslint.options": {
+    //     "configFile": "D:/code/front-end/node/webpack/webpack_vue_cli/eslint.config.js",
+    // },
+    // "eslint.workingDirectories": ["../src"]
+}
