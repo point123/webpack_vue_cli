@@ -113,8 +113,7 @@ module.exports = {
         port: "8080",
         hot: true,
         open: true,
+        // 解决路由history模式下刷新404问题
         historyApiFallback: true
     }
 }
-
-// vue2最高只支持vue-loader@15

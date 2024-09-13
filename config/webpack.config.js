@@ -1,18 +1,21 @@
 const path = require("node:path");
+const process = require("node:process");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const EslintWebpackPlugin = require("eslint-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-const { VueLoaderPlugin } = require('vue-loader')
+const { VueLoaderPlugin } = require('vue-loader');
+
+const isProduction = process.env.NODE_ENV === "production";
 
 module.exports = {
     entry: "./src/main.js",
     output: {
-        path: path.resolve(__dirname, "../dist"),
-        filename: "static/js/[name].[contentHash:10].js",
-        chunkFilename: "static/js/[name].[contentHash:10].chunk.js",
+        path: isProduction ? path.resolve(__dirname, "../dist") : undefined,
+        filename: `static/js/[name]${isProduction ? ".[contentHash:10]" : ""}.js`,
+        chunkFilename: `static/js/[name]${isProduction ? ".[contentHash:10]" : ""}.chunk.js`,
         assetModuleFilename: "static/assets/[hash:10][ext][query]",
         clean: true
     },
@@ -21,7 +24,7 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    isProduction ? MiniCssExtractPlugin.loader : "vue-style-loader",
                     "css-loader",
                     "postcss-loader"
                 ]
@@ -29,7 +32,7 @@ module.exports = {
             {
                 test: /\.less$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    isProduction ? MiniCssExtractPlugin.loader : "vue-style-loader",
                     "css-loader",
                     "postcss-loader",
                     "less-loader"
@@ -38,7 +41,7 @@ module.exports = {
             {
                 test: /\.s[ac]ss$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    isProduction ? MiniCssExtractPlugin.loader : "vue-style-loader",
                     "css-loader",
                     "postcss-loader",
                     "sass-loader"
@@ -47,7 +50,7 @@ module.exports = {
             {
                 test: /\.styl$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    isProduction ? MiniCssExtractPlugin.loader : "vue-style-loader",
                     "css-loader",
                     "postcss-loader",
                     "stylus-loader"
@@ -83,7 +86,11 @@ module.exports = {
             },
             {
                 test: /\.vue$/,
-                loader: "vue-loader"
+                loader: "vue-loader",
+                options: {
+                    // 开启vue-loader缓存
+                    cacheDirectory: path.resolve(__dirname, "../node_modules/.cache/vue-loader")
+                }
             }
         ]
     },
@@ -98,11 +105,11 @@ module.exports = {
             cacheLocation: path.resolve(__dirname, "../node_modules/.cache/eslintcache"),
             eslintPath: "eslint/use-at-your-own-risk"
         }),
-        new MiniCssExtractPlugin({
+        isProduction && new MiniCssExtractPlugin({
             filename: "static/css/[name].[contentHash:10].css",
             chunkFilename: "static/css/[name].[contentHash:10].chunk.css"
         }),
-        new CopyWebpackPlugin({
+        isProduction && new CopyWebpackPlugin({
             patterns: [
                 {
                     from: path.resolve(__dirname, "../public"),
@@ -113,19 +120,37 @@ module.exports = {
                 }
             ]
         })
-    ],
-    mode: "production",
-    devtool: false,
+    ].filter(Boolean),
+    mode: isProduction ? "production": "development",
+    devtool: isProduction ? false : "source-map", 
     resolve: {
         extensions: [".vue",".js",".json"]
     },
     optimization: {
         splitChunks: {
-            chunks: "all"
+            chunks: "all",
+            cacheGroups: {
+                vue: {
+                    test: /[\\/]node_modules[\\/]vue(.*)?[\\/]/,
+                    name: "vue-chunk",
+                    priority: 20
+                },
+                elementUI: {
+                    test: /[\\/]node_modules[\\/]element-ui[\\/]/,
+                    name: "element-ui-chunk",
+                    priority: 10
+                },
+                libs: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "libs-chunk",
+                    priority: 0
+                }
+            }
         },
         runtimeChunk: {
             name: entryPoint => `runtime~${entryPoint.name}` 
         },
+        minimize: isProduction,
         minimizer: [
             new CssMinimizerPlugin(),
             new ImageMinimizerPlugin({
@@ -161,5 +186,20 @@ module.exports = {
                 }
             })
         ]
-    }
+    },
+    devServer: {
+        host: "localhost",
+        port: "8080",
+        hot: true,
+        open: true,
+        // 解决路由history模式下刷新404问题
+        historyApiFallback: true
+    },
+    performance: false
+    // performance: {
+    //     hint: false
+    // }
+    // performance: {
+    //     maxEntrypointSize: 500 * 1000
+    // }
 }

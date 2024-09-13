@@ -8,6 +8,7 @@ export default {
     methods: {
         hanleFunction() {
             var a;
+            console.log();
         }
     }
 }
